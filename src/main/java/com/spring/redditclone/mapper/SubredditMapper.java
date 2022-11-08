@@ -3,6 +3,7 @@ package com.spring.redditclone.mapper;
 import com.spring.redditclone.dto.SubredditDto;
 import com.spring.redditclone.model.Post;
 import com.spring.redditclone.model.Subreddit;
+import com.spring.redditclone.model.User;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,6 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface SubredditMapper {
     @Mapping(target = "numberOfPosts", expression = "java(mapPosts(subreddit.getPosts()))")
+    @Mapping(target = "subredditName", source = "name")
     SubredditDto mapSubredditToDto(Subreddit subreddit);
 
     default int mapPosts(List<Post> numberOfPosts) {
@@ -20,5 +22,6 @@ public interface SubredditMapper {
 
     @InheritInverseConfiguration
     @Mapping(target = "posts", ignore = true)
-    Subreddit mapDtoToSubreddit(SubredditDto subredditDto);
+    @Mapping(target = "name", source = "subredditDto.subredditName")
+    Subreddit mapDtoToSubreddit(SubredditDto subredditDto, User user);
 }

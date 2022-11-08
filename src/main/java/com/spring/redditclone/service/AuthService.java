@@ -11,20 +11,23 @@ import com.spring.redditclone.repository.UserRepository;
 import com.spring.redditclone.repository.VerificationTokenRepository;
 import com.spring.redditclone.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AuthService {
     private final PasswordEncoder passwordEncoder;
@@ -66,13 +69,13 @@ public class AuthService {
         return token;
     }
 
+    @Transactional
     public void verifyAccount(String token) {
         Optional<VerificationToken> tokenOptional = verificationTokenRepository.findByToken(token);
         VerificationToken verificationToken = tokenOptional.orElseThrow(() -> new RedditCloneException("Invalid Token"));
         fetchUserAndEnable(verificationToken);
     }
 
-    @Transactional
     private void fetchUserAndEnable(VerificationToken verificationToken) {
         String username = verificationToken.getUser().getUsername();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RedditCloneException("User not found with name - " + username));
@@ -86,5 +89,13 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String token = jwtProvider.generateToken(authenticate);
         return new AuthenticationResponse(token, loginRequest.getUsername());
+    }
+
+    @Transactional(readOnly = true)
+    public User getCurrentUser() {
+        String name = SecurityContextHolder.
+                getContext().getAuthentication().getName();
+        return userRepository.findByUsername(name)
+                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + name));
     }
 }

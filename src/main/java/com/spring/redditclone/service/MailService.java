@@ -29,7 +29,6 @@ public class MailService {
         };
         try {
             javaMailSender.send(mimeMessagePreparator);
-            log.info("Activation email sent!");
         } catch (MailException e) {
             throw new RedditCloneException("Exception occurred when sending email to " + notificationEmail.getRecipient()
                     + ", " + e.getMessage()

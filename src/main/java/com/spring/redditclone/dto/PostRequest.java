@@ -6,12 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class SubredditDto {
+public class PostRequest {
     private long id;
-    private String subredditName;
+    private String subRedditName;
+    private String postName;
+    private String url;
     private String description;
-    private int numberOfPosts;
 }
