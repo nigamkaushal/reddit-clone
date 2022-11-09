@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ public class CommentService {
     private final MailService mailService;
     private final MailContentBuilder mailContentBuilder;
 
+    @Transactional
     public void save(CommentDto commentDto) {
         Post post = postRepository.findById(commentDto.getPostId())
                 .orElseThrow(() -> new RedditCloneException("Post Not found with id : " + commentDto.getPostId()));
@@ -45,6 +47,7 @@ public class CommentService {
                 user.getEmail(), message));
     }
 
+    @Transactional(readOnly = true)
     public List<CommentDto> getAllCommentsForPost(long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RedditCloneException("Post Not found with id : " + postId));
@@ -54,6 +57,7 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<CommentDto> getAllCommentsForUser(String userName) {
         User user = userRepository.findByUsername(userName)
                 .orElseThrow(() -> new UsernameNotFoundException(userName));

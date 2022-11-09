@@ -39,7 +39,7 @@ public class SubredditService {
 
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public SubredditDto getSubreddit(long id) {
         return subredditMapper
                 .mapSubredditToDto(
