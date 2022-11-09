@@ -38,6 +38,7 @@ public class AuthService {
     private String verificationUrl;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @Transactional
     public void signUp(RegisterRequest registerRequest) throws RedditCloneException {
@@ -88,7 +89,12 @@ public class AuthService {
                 loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String token = jwtProvider.generateToken(authenticate);
-        return new AuthenticationResponse(token, loginRequest.getUsername());
+        return AuthenticationResponse.builder()
+                .authenticationToken(token)
+                .refreshToken(refreshTokenService.generateRefreshToken().getToken())
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationTime()))
+                .username(loginRequest.getUsername())
+                .build();
     }
 
     @Transactional(readOnly = true)

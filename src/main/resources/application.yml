@@ -1,0 +1,27 @@
+spring:
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+      use-new-id-generator-mappings: true
+    show-sql: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/reddit-clone
+    username: postgres
+    password: pass
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+accountVerificationUrl: http://localhost:8080/api/auth/accountVerification/
+
+jwt.expiration.time: 900000
+
